@@ -1,3 +1,31 @@
 from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin as DefaultUserAdmin
 
-# Register your models here.
+from .models import CustomUser, Movie
+
+
+@admin.register(CustomUser)
+class UserAdmin(DefaultUserAdmin):
+    pass
+
+
+@admin.register(Movie)
+class Movie(admin.ModelAdmin):
+    fields = (
+        "title",
+        "genre",
+        "year",
+        "created_date",
+        "updated_date",
+    )
+    list_display = (
+        "title",
+        "genre",
+        "year",
+        "created_date",
+        "updated_date",
+    )
+    readonly_fields = (
+        "created_date",
+        "updated_date",
+    )
