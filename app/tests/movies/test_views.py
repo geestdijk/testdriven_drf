@@ -116,7 +116,7 @@ def test_update_movie(client, add_movie):
 
 @pytest.mark.django_db
 def test_update_movie_incorrect_id(client):
-    resp = client.put("/api/movies/99/)
+    resp = client.put("/api/movies/99/")
     assert resp.status_code == 404
 
 
