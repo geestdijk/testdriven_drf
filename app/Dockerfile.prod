@@ -1,5 +1,36 @@
+###########
+# BUILDER #
+###########
+
 # pull official base image
-from python:3.8.2-alpine
+FROM python:3.8.2-alpine as builder
+
+# set work directory
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+
+# install psycopg2 dependencies
+RUN apk update \
+    && apk add postgresql-dev gcc python3-dev musl-dev
+
+# install dependencies
+RUN pip install --upgrade pip
+COPY ./requirements.txt .
+RUN pip wheel --no-cache-dir --no-deps --wheel-dir /usr/src/app/wheels -r requirements.txt
+
+# lint
+COPY . /usr/src/app/
+RUN pip install black flake8 isort
+RUN flake8 .
+RUN black --exclude=migrations .
+RUN isort ./*/*.py
+
+#########
+# FINAL #
+#########
+
+# pull official base image
+FROM python:3.8.2-alpine
 
 # set work directory
 WORKDIR /usr/src/app
@@ -8,17 +39,17 @@ WORKDIR /usr/src/app
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 ENV DEBUG 0
-ENV SECRET_KEY "x15s#vjsd^rebobr-f0)#jl$it1z_t-^c^^xi5gdhg-sv8@nz1"
+ENV SECRET_KEY foo
 ENV DJANGO_ALLOWED_HOSTS .herokuapp.com
 
 # install psycopg2 dependencies
 RUN apk update \
     && apk add postgresql-dev gcc python3-dev musl-dev
 
-# install dependencies
+COPY --from=builder /usr/src/app/wheels /wheels
+COPY --from=builder /usr/src/app/requirements.txt .
 RUN pip install --upgrade pip
-COPY ./requirements.txt /usr/src/app/requirements.txt
-RUN pip install -r requirements.txt
+RUN pip install --no-cache /wheels/*
 
 # copy project
 COPY . /usr/src/app/
