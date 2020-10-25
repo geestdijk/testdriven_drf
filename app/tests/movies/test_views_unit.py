@@ -41,7 +41,7 @@ def test_get_single_movie(client, monkeypatch):
     monkeypatch.setattr(MovieDetail, "get_object", mock_get_object)
     monkeypatch.setattr(MovieSerializer, "data", payload)
 
-    resp = client.get(f"/api/movies/1/")
+    resp = client.get("/api/movies/1/")
     assert resp.status_code == 200
     assert resp.data["title"] == "The Big Lebowski"
 
@@ -79,7 +79,7 @@ def test_remove_movie(client, monkeypatch):
 
     monkeypatch.setattr(MovieDetail, "get_object", mock_get_object)
 
-    resp = client.delete(f"/api/movies/1/")
+    resp = client.delete("/api/movies/1/")
     assert resp.status_code == 204
 
 
@@ -89,7 +89,7 @@ def test_remove_movie_incorrect_id(client, monkeypatch):
 
     monkeypatch.setattr(MovieDetail, "get_object", mock_get_object)
 
-    resp = client.delete(f"/api/movies/99/")
+    resp = client.delete("/api/movies/99/")
     assert resp.status_code == 404
 
 
@@ -105,7 +105,7 @@ def test_update_movie(client, monkeypatch):
     monkeypatch.setattr(MovieDetail, "get_object", mock_get_object)
     monkeypatch.setattr(MovieSerializer, "update", mock_update_object)
 
-    resp = client.put(f"/api/movies/1/", payload, content_type="application/json",)
+    resp = client.put("/api/movies/1/", payload, content_type="application/json",)
     assert resp.status_code == 200
     assert resp.data["title"] == payload["title"]
     assert resp.data["year"] == payload["year"]
@@ -117,7 +117,7 @@ def test_update_movie_incorrect_id(client, monkeypatch):
 
     monkeypatch.setattr(MovieDetail, "get_object", mock_get_object)
 
-    resp = client.put(f"/api/movies/99/")
+    resp = client.put("/api/movies/99/")
     assert resp.status_code == 404
 
 
@@ -131,5 +131,5 @@ def test_update_movie_invalid_json(client, monkeypatch, payload, status_code):
 
     monkeypatch.setattr(MovieDetail, "get_object", mock_get_object)
 
-    resp = client.put(f"/api/movies/1/", payload, content_type="application/json",)
+    resp = client.put("/api/movies/1/", payload, content_type="application/json",)
     assert resp.status_code == status_code
