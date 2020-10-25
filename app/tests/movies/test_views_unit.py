@@ -105,11 +105,7 @@ def test_update_movie(client, monkeypatch):
     monkeypatch.setattr(MovieDetail, "get_object", mock_get_object)
     monkeypatch.setattr(MovieSerializer, "update", mock_update_object)
 
-    resp = client.put(
-        "/api/movies/1/",
-        payload,
-        content_type="application/json",
-    )
+    resp = client.put("/api/movies/1/", payload, content_type="application/json",)
     assert resp.status_code == 200
     assert resp.data["title"] == payload["title"]
     assert resp.data["year"] == payload["year"]
@@ -135,9 +131,5 @@ def test_update_movie_invalid_json(client, monkeypatch, payload, status_code):
 
     monkeypatch.setattr(MovieDetail, "get_object", mock_get_object)
 
-    resp = client.put(
-        "/api/movies/1/",
-        payload,
-        content_type="application/json",
-    )
+    resp = client.put("/api/movies/1/", payload, content_type="application/json",)
     assert resp.status_code == status_code
