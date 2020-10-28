@@ -44,7 +44,7 @@ test:
     - pytest -p no:warnings
     - flake8 .
     - black --check --exclude="migrations|env" .
-    - isort ./*/*.py --check-only
+    - isort . --check-only
 
 deploy:
   stage: deploy
