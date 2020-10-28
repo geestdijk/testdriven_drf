@@ -22,6 +22,7 @@ build:
         --cache-from $IMAGE:latest
         --tag $IMAGE:latest
         --file ./Dockerfile.prod
+        --build-arg SECRET_KEY=$SECRET_KEY
         "."
     - docker push $IMAGE:latest
 
@@ -41,10 +42,13 @@ test:
     - source env/bin/activate
     - pip install -r requirements.txt
     - pip install black flake8 isort pytest pytest-django
+    - export DEBUG=1
     - pytest -p no:warnings
     - flake8 .
     - black --check --exclude="migrations|env" .
-    - isort /usr/src/app/. --check-only
+    - isort ./*/*.py --check-only
+    - export DEBUG=0
+    - python manage.py check --deploy --fail-level=WARNING
 
 deploy:
   stage: deploy
@@ -52,7 +56,7 @@ deploy:
     - docker:dind
   variables:
     DOCKER_DRIVER: overlay2
-    HEROKU_APP_NAME: ancient-ravine-64109
+    HEROKU_APP_NAME: stark-headland-84690
     HEROKU_REGISTRY_IMAGE: registry.heroku.com/${HEROKU_APP_NAME}/web
   script:
     - apk add --no-cache curl
@@ -60,6 +64,7 @@ deploy:
     - docker build
         --tag $HEROKU_REGISTRY_IMAGE
         --file ./Dockerfile.prod
+        --build-arg SECRET_KEY=$SECRET_KEY
         "."
     - docker login -u _ -p $HEROKU_AUTH_TOKEN registry.heroku.com
     - docker push $HEROKU_REGISTRY_IMAGE
